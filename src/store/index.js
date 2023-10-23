@@ -5,6 +5,6 @@ import { customerReducer } from './customerReducer'
 export const store = configureStore({
 	reducer: {
 		cash: cashReducer,
-		customer: customerReducer,
+		customers: customerReducer,
 	},
 })
