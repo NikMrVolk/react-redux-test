@@ -1,42 +1,43 @@
 import { useDispatch, useSelector } from 'react-redux'
-import { addCustomerAction, removeAllCustomerAction, removeCustomerAction } from './store/customerReducer'
-import { addCashAction, getCashAction } from './store/cashReducer'
+import { increment, decrement, addUser, deleteLastUser, deleteUser } from './store/toolkitSlice'
+import { getAllUsers } from './asyncActions/users'
 import './App.css'
-import { featchCustomers } from './asyncActions/customers'
+import { useEffect } from 'react'
 
 function App() {
 	const dispatch = useDispatch()
-	const cash = useSelector((state) => state.cash.cash)
-	const customers = useSelector((state) => state.customers.customers)
+
+	const { users, counter, loading } = useSelector((state) => state.toolkit)
 
 	const addCash = (moneyValue) => {
-		dispatch(addCashAction(moneyValue))
+		dispatch(increment(moneyValue))
 	}
 
 	const getCash = (moneyValue) => {
-		dispatch(getCashAction(moneyValue))
+		dispatch(decrement(moneyValue))
 	}
 
-	const getCustomers = () => {
-		dispatch(featchCustomers())
-	}
+	const getCustomers = () => {}
 
-	const addCustomer = (name) => {
+	const addCustomer = (text) => {
 		const customer = {
 			id: Date.now(),
-			name,
+			text,
 		}
-
-		dispatch(addCustomerAction(customer))
+		dispatch(addUser(customer))
 	}
 
 	const removeCustomer = (id) => {
-		dispatch(removeCustomerAction(id))
+		dispatch(deleteUser(id))
 	}
 
-	const removeAllCustomers = () => {
-		dispatch(removeAllCustomerAction())
+	const removeLastCustomer = () => {
+		dispatch(deleteLastUser())
 	}
+
+	useEffect(() => {
+		dispatch(getAllUsers())
+	}, [])
 
 	return (
 		<div
@@ -70,7 +71,7 @@ function App() {
 				>
 					Снять со счёта
 				</button>
-				{cash}
+				{counter}
 			</div>
 			<div
 				style={{
@@ -86,23 +87,24 @@ function App() {
 					Добавить клиента
 				</button>
 				<button onClick={getCustomers}>Получить клиентов из базы</button>
-				<button onClick={removeAllCustomers}>удалить клиентов</button>
+				<button onClick={removeLastCustomer}>удалить последнего клиента</button>
 			</div>
 			<div>
-				{customers?.length ? (
+				{!!users.lenght && 'Пользователей нет'}
+				{loading ? (
+					'Загрузка...'
+				) : (
 					<>
-						{customers.map((customer) => (
+						{users.map((user) => (
 							<div
 								onClick={() => {
-									removeCustomer(customer.id)
+									removeCustomer(user.id)
 								}}
 							>
-								{customer.name}
+								{user.text}
 							</div>
 						))}
 					</>
-				) : (
-					'Клиенты отсутствуют'
 				)}
 			</div>
 		</div>
